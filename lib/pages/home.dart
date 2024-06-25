@@ -1,79 +1,54 @@
-
 import 'package:flutter/material.dart';
-import 'package:mobile/data/db_management.dart';
-import 'package:mobile/pages/favorites.dart';
-import 'package:mobile/pages/generator.dart';
-import 'package:mobile/pages/test.dart';
+import 'package:mobile/core/app_state.dart';
+import 'package:provider/provider.dart';
 
-class Home extends StatefulWidget {
-  
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  int _selectedIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    DB.init();
-  }
+class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
+    var total = appState.total;
 
-    Widget page;
-    switch (_selectedIndex) {
-      case 0:
-        page = GeneratorPage(); break;
-      case 1:
-        page = FavoritesPage(); break;
-      case 2:
-        page = TestingPage(); break;
-      default:
-        throw UnimplementedError('no widget for $_selectedIndex');
-    }
+    final theme = Theme.of(context);
+    // final style = theme.textTheme.displayMedium!.copyWith(
+    //   color: theme.colorScheme.onPrimary
+    // );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          body: Column(
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: SafeArea(
-                  child: Container(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    child: page,
-                  ),
-                ),
+              ElevatedButton(
+                onPressed: () => appState.insertBalance(),
+                child: Text('Insert')
               ),
-              BottomNavigationBar(
-                currentIndex: _selectedIndex,
-                onTap: (value) {
-                  setState(() {
-                    _selectedIndex = value;
-                  });
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: 'Home',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.favorite),
-                    label: 'Favorites',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.functions),
-                    label: 'Fuck?',
-                  ),
-                ],
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () => appState.getBalances(),
+                child: Text('Get Balances')
               ),
             ]
+          ),
+          SizedBox(height: 10),
+          Center(
+            child: Card(
+              color: theme.colorScheme.primary,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'total balances: $total'
+                )
+              )
+            )
           )
-        );
-      }
+        ]
+      )
     );
   }
+  
 }

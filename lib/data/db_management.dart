@@ -4,6 +4,8 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
 abstract class DB {
+  static const String tableName = 'tb_daily_balance';
+
   static Database? _db;
   static int get _version => 1;
 
@@ -12,10 +14,10 @@ abstract class DB {
 
     try {
       var dbPath = await getDatabasesPath();
-      var path = p.join(dbPath, 'my_db_name.db');
+      var path = p.join(dbPath, 'quiosque.db');
 
       _db = await openDatabase(
-        path, 
+        path,
         version: _version,
         onCreate: onCreate
       );
@@ -25,15 +27,31 @@ abstract class DB {
     }
   }
 
-  static onCreate(Database db, int version) => db.execute('''
-    create table if not exists transactions(
-      id integer primary key,
-      name varchar(128) not null,
-      amount integer not null,
-      eventdate integer not null,
-      fl_income_expense char(1) not null default 'I',
-      maturity_date integer,
-      due_date integer
-    )'''
-  );
+  static onCreate(Database db, int version) {
+    db.execute('''
+      create table if not exists $tableName(
+        date integer primary key,
+        cash integer not null,
+        pix integer not null,
+        card integer not null,
+        change integer not null,
+        outcomes integer not null,
+        total integer not null
+      )'''
+    );
+  }
+
+  static Future<void> insertDailyBalance(Map<String, Object?> dto) async {
+    await _db!.insert(
+      tableName,
+      dto,
+      conflictAlgorithm: ConflictAlgorithm.replace
+    );
+  }
+
+  static Future<int> getAllBalances() async {
+    var query = await _db!.query(tableName);
+
+    return query.length;
+  }
 }

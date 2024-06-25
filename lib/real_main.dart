@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/core/app_state.dart';
-import 'package:mobile/pages/home.dart';
+import 'package:mobile/pages/entrypoint.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {
@@ -20,7 +20,7 @@ class App extends StatelessWidget {
 					useMaterial3: true,
 					colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)
 				),
-				home: Home()
+				home: Entrypoint()
 			)
 		);
 	}
