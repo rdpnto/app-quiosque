@@ -14,11 +14,11 @@ class App extends StatelessWidget {
 			child: MaterialApp
 			(
         debugShowCheckedModeBanner: false,
-				title: 'MyFinance',
+				title: 'App Quiosque',
 				theme: ThemeData
 				(
 					useMaterial3: true,
-					colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)
+					colorScheme: ColorScheme.fromSeed(seedColor: Colors.green)
 				),
 				home: Entrypoint()
 			)

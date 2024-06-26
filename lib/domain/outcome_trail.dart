@@ -1,14 +1,12 @@
 class OutcomeTrail {
-  Map<String, double> employees;
+  double employees;
   double gas;
   double potato;
-  late double total;
+  double get total => employees + gas + potato;
 
   OutcomeTrail({
     required this.employees,
     required this.gas,
     required this.potato
-  }) {
-    total = employees.values.reduce((sum, value) => sum + value) + gas + potato;
-  }
+  });
 }

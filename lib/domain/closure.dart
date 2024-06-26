@@ -26,7 +26,7 @@ class Closure {
     required double credit,
     required double opening,
     required double closure,
-    required Map<String, double> employeeOutcomes,
+    required double employeeOutcomes,
     required double gas,
     required double potato
   }) {

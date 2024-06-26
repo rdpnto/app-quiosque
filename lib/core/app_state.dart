@@ -5,12 +5,14 @@ import 'package:mobile/domain/closure.dart';
 import 'package:mobile/domain/daily_balance.dart';
 
 class AppState extends ChangeNotifier {
+  int month = DateTime.now().month;
+  int year = DateTime.now().year;
+
   AppState() {
     DB.init();
   }
   
   List<DailyBalance> balances = <DailyBalance>[];
-  int total = 0;
 
   Future<void> insertBalance() async {
     var dto = Mapper.toDto(Closure(
@@ -27,6 +29,7 @@ class AppState extends ChangeNotifier {
     ));
 
     await DB.insertDailyBalance(dto);
+    notifyListeners();
   }
 
 	Future<void> getBalances() async {
