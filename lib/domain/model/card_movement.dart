@@ -1,4 +1,4 @@
-class CardRevenue {
+class CardMovement {
   static const double creditTax = 2.99;
   static const double debitTax = 1.19;
 
@@ -12,7 +12,7 @@ class CardRevenue {
 
   late double discountedAmount;
 
-  CardRevenue(this.grossCredit, this.grossDebit) {
+  CardMovement(this.grossCredit, this.grossDebit) {
     netCredit = grossCredit * (1 - creditTax);
     netDebit = grossDebit * (1 - debitTax);
 

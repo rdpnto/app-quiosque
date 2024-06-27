@@ -11,6 +11,7 @@ class HomePage extends StatelessWidget {
 
     var month = appState.month;
     var year = appState.year;
+
     var date = DateFormat('MMMM/yy').format(DateTime(year, month));
 
     return Scaffold(
@@ -23,11 +24,26 @@ class HomePage extends StatelessWidget {
 class HomeTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
+    var appState = context.watch<AppState>();
+    var rows = appState
+      .balances
+      .map((e) {
+        return DataRow(cells: [
+          DataCell(Text(DateFormat('dd/MM/yyyy').format(e.date))),
+          DataCell(Text(e.cash.toString())),
+          DataCell(Text(e.pix.toString())),
+          DataCell(Text(e.card.toString())),
+          DataCell(Text(e.change.toString())),
+          DataCell(Text(e.expenses.toString())),
+          DataCell(Text(e.netBalance.toString()))
+        ]);
+      })
+      .toList();
+      
     var theme = Theme.of(context);
     var style = theme.textTheme.displayMedium!
-      .copyWith(color: theme.colorScheme.onPrimary, fontStyle: FontStyle.italic)
-      .apply(fontSizeFactor: 0.8);
+      .copyWith(color: Colors.black87, fontStyle: FontStyle.italic)
+      .apply(fontSizeFactor: 0.4);
 
     return DataTable(
       columns: <DataColumn>[
@@ -39,19 +55,7 @@ class HomeTable extends StatelessWidget {
         DataColumn(label: Expanded(child: Text('Saídas', style: style))),
         DataColumn(label: Expanded(child: Text('Total', style: style)))
       ],
-      rows: <DataRow>[
-        DataRow(
-          cells: <DataCell>[
-            DataCell(Text('Teste')),
-            DataCell(Text('Teste')),
-            DataCell(Text('Teste')),
-            DataCell(Text('Teste')),
-            DataCell(Text('Teste')),
-            DataCell(Text('Teste')),
-            DataCell(Text('Teste'))
-          ]
-        )
-      ]
+      rows: rows
     );
   }
 }

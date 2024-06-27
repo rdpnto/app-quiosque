@@ -1,16 +1,27 @@
 import 'package:mobile/data/model/daily_balance_dto.dart';
+import 'package:mobile/data/model/resource_dto.dart';
 
-class Mapper {
-  static DailyBalanceDto toDto(Map<String, dynamic> doc) {
+class DataMapper {
+  static DailyBalanceDto toDailyBalanceDto(Map<String, dynamic> map) {
     return DailyBalanceDto(
-      date: doc['date'] ,
-      cash: doc['cash'],
-      pix: doc['pix'],
-      credit: doc['credit'],
-      debit: doc['debit'],
-      opening: doc['opening'],
-      closure: doc['closure'],
-      expenses: doc['expenses']
+      date: map['date'] ,
+      cash: map['cash'],
+      pix: map['pix'],
+      credit: map['credit'],
+      debit: map['debit'],
+      opening: map['opening'],
+      closure: map['closure'],
+      expenses: map['expenses']
+    );
+  }
+
+  static ResourceDto toResourceDto(Map<String, dynamic> map) {
+    return ResourceDto(
+      id: map['id'],
+      name: map['name'],
+      description: map['description'],
+      isEmployee: map['isEmployee'] == 1,
+      salary: map['salary']
     );
   }
 }

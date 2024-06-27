@@ -1,11 +1,11 @@
 class DailyBalance {
   DateTime date;
   double cash;
-  double pix;
   double card;
+  double pix;
   double change;
-  double outcomes;
-  double total;
+  double expenses;
+  double netBalance;
 
   DailyBalance({
     required this.date,
@@ -13,8 +13,8 @@ class DailyBalance {
     required this.pix,
     required this.card,
     required this.change,
-    required this.outcomes,
-    required this.total
+    required this.expenses,
+    required this.netBalance
   });
 
   Map<String, Object?> toMap() {
@@ -24,13 +24,13 @@ class DailyBalance {
       'pix': pix,
       'card': card,
       'change': change,
-      'outcomes': outcomes,
-      'total': total
+      'expenses': expenses,
+      'total': netBalance
     };
   }
 
   @override
   String toString() {
-    return 'Closure { date: $date, cash: $cash, pix: $pix, card: $card, change: $change, outcomes: $outcomes, total: $total }';
+    return 'Closure { date: $date, cash: $cash, pix: $pix, card: $card, change: $change, expenses: $expenses, netBalance: $netBalance }';
   }
 }
