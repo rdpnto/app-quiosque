@@ -61,15 +61,15 @@ class _EntrypointState extends State<Entrypoint> {
                 items: [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.attach_money),
-                    label: 'Balances',
+                    label: 'Fechamento',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.add_chart),
-                    label: 'Register',
+                    label: 'Cadastro',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.domain),
-                    label: 'Config',
+                    label: 'Entidades',
                   ),
                 ],
               ),

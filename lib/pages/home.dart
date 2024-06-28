@@ -17,6 +17,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Fechamento $date', style: style),
+        backgroundColor: Color.fromARGB(255, 174, 196, 164),
         actions: [
           IconButton(
             icon: const Icon(Icons.date_range),
