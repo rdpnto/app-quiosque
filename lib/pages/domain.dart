@@ -15,7 +15,7 @@ class DomainPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(resource == null ? 'Adicionar' : 'Editar'),
+          title: Text(resource == null ? 'Adicionar Entidade' : 'Editar'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -65,7 +65,7 @@ class DomainPage extends StatelessWidget {
                 // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               },
-              child: Text(resource == null ? 'Add' : 'Update'),
+              child: Text(resource == null ? 'Adicionar' : 'Atualizar'),
             ),
           ],
         );
@@ -80,7 +80,8 @@ class DomainPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Domain Configuration'),
+        title: Text('Cadastro de Entidades'),
+        backgroundColor: Color.fromARGB(255, 174, 196, 164),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -122,7 +123,7 @@ class DomainPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () => showEntityDialog(context),
-              child: Text('Add Entity'),
+              child: Text('Adicionar Entidade'),
             ),
           ],
         ),

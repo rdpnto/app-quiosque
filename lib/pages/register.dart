@@ -97,9 +97,12 @@ class RegisterPageState extends State<RegisterPage> {
       .apply(fontSizeFactor: 0.46);
     
     return Scaffold(
-      appBar: AppBar(title: Text('Registrar Fechamento')),
+      appBar: AppBar(
+        title: Text('Registrar Fechamento'),
+        backgroundColor: Color.fromARGB(255, 174, 196, 164),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -194,6 +197,7 @@ class RegisterPageState extends State<RegisterPage> {
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.|,?\d{0,2}'))],
                 onChanged: (value) => _potato = double.tryParse(value.replaceFirst(',','.')) ?? 0,
               ),
+              SizedBox(height: 14,),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -214,7 +218,8 @@ class RegisterPageState extends State<RegisterPage> {
                     child: Text('Salvar Fechamento')
                   ),
                 ]
-              )
+              ),
+              SizedBox(height: 5),
             ]
           )
         ),
