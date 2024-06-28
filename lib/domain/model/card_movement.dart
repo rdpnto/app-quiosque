@@ -1,7 +1,6 @@
-class CardMovement {
-  static const double creditTax = 2.99;
-  static const double debitTax = 1.19;
+import 'package:mobile/data/db_cache.dart';
 
+class CardMovement {
   double grossCredit;
   double grossDebit;
   late double grossBalance;
@@ -13,8 +12,8 @@ class CardMovement {
   late double discountedAmount;
 
   CardMovement(this.grossCredit, this.grossDebit) {
-    netCredit = grossCredit * (1 - creditTax);
-    netDebit = grossDebit * (1 - debitTax);
+    netCredit = grossCredit * (1 - DBCache.creditTax/100);
+    netDebit = grossDebit * (1 - DBCache.debitTax/100);
 
     grossBalance = grossCredit + grossDebit;
     netBalance = netDebit + netCredit;

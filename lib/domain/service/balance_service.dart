@@ -10,27 +10,67 @@ class BalanceService {
   Future<bool> init() async {
     await DB.init();
     await updateResourceCache();
+    await updateCardTaxCache();
 
     return true;
   }
 
-  Future<List<DailyBalance>> getMontlyBalance(int month, int year) async {
-    var dto = await DB.getAllBalances();
+  Future<void> insertResource(
+    String name,
+    String description,
+    bool isEmployee,
+    double salary
+  ) async {
+    var resource = Resource(
+      name: name,
+      description: description,
+      isEmployee: isEmployee,
+      salary: salary
+    );
 
-    return dto
-      .map((dto) => DomainMapper.toClosure(dto))
-      .map((mod) => DomainMapper.toDailyBalance(mod))
-      .toList();
-  }
+    resource.setId(DBCache.resourceIds[resource.name]);
 
-  Future<void> insertResource(Resource resource) async {
-    var affected = await DB.insertResources(resource.toMap());
-
-    if (affected != 1) throw Exception();
+    await DB.insertResources(resource.toMap());
 
     await updateResourceCache();
   }
 
+  Future<void> insertBalance(
+    DateTime datePosition,
+    double cashBalance,
+    double pixBalance,
+    double credit,
+    double debit,
+    double opening,
+    double closure,
+    Map<String, double> employeeOutcomes,
+    double gas,
+    double potato
+  ) async {
+    final expenses = employeeOutcomes;
+    if (gas > 0) expenses['Gas'] = gas;
+    if (potato > 0) expenses['Batata'] = potato;
+
+    var model = Closure(
+      datePosition: datePosition,
+      cashBalance: cashBalance,
+      pixBalance: pixBalance,
+      credit: credit,
+      debit: debit,
+      opening: opening,
+      closure: closure,
+      expenseList: expenses
+    );
+    
+    await DB.insertDailyBalance(model.toDailyBalanceMap());
+    await DB.insertCardMovement(model.toCardMovementMap());
+    await DB.insertRegister(model.toRegisterMap());
+
+    for (var map in model.expenseTrail.map((e) => e.toMap())) {
+      await DB.insertExpense(map);
+    }
+  }
+  
   static Future<void> updateResourceCache() async {
     var resources = await DB.getResources();
 
@@ -39,39 +79,44 @@ class BalanceService {
     );
   }
 
-  Future<void> insertBalance(
-    DateTime datePosition,
-    double cashBalance,
-    double pixBalance,
-    double debit,
-    double credit,
-    double opening,
-    double closure,
-    Map<String, double> employeeOutcomes,
-    double gas,
-    double potato
-  ) async {
-    var model = Closure(
-      datePosition: datePosition,
-      cashBalance: cashBalance,
-      pixBalance: pixBalance,
-      debit: debit,
-      credit: credit,
-      opening: opening,
-      closure: closure,
-      employeeExpenses: employeeOutcomes,
-      gas: gas,
-      potato: potato,
+  static Future<void> updateCardTaxCache() async {
+    var taxes = await DB.getCardTaxes();
+
+    DBCache.setCardTax(taxes.creditTax, taxes.debitTax);
+  }
+
+  Future<List<DailyBalance>> getMontlyBalance(int year, int month) async {
+    var startDate = DateTime(year, month, 1);
+    var endDate = DateTime(year, month + 1, 1).add(Duration(days: -1));
+
+    var response = await DB.getAllBalances(
+      startDate.toUtc().millisecondsSinceEpoch,
+      endDate.toUtc().millisecondsSinceEpoch
+    );
+
+    return response
+      .map((dto) => DomainMapper.toClosure(dto))
+      .map((mod) => DomainMapper.toDailyBalance(mod))
+      .toList();
+  }
+
+  Future<List<Resource>> getResources() async {
+    var response = await DB.getResources();
+
+    return response
+      .map((dto) => DomainMapper.toResource(dto))
+      .toList();
+  }
+
+  Future<void> deleteResource(String name) async {
+    var toDelete = Resource(
+      name: name,
+      description: "",
+      isEmployee: false
     );
     
-    int affected = 0;
+    var id = DBCache.resourceIds[toDelete.name]!;
 
-    affected += await DB.insertDailyBalance(model.toDailyBalanceMap());
-    affected += await DB.insertCardMovement(model.toCardMovementMap());
-    affected += await DB.insertRegister(model.toRegisterMap());
-
-    for (var map in model.toExpensesMap()) {
-      await DB.insertExpenses(map);
-    }
+    return await DB.deleteResource(id);
   }
 }

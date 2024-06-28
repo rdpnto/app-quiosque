@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:mobile/data/mapper.dart';
+import 'package:mobile/data/model/card_taxes_dto.dart';
 import 'package:mobile/data/model/daily_balance_dto.dart';
 import 'package:mobile/data/model/resource_dto.dart';
 import 'package:mobile/data/sql/commands.dart';
@@ -30,7 +31,7 @@ abstract class DB {
         path,
         version: _version,
         onCreate: (db, version) async => await db.execute(CommandSQL.createTablesSQL),
-        onOpen: (db) async => await reset(db, _version)
+        // onOpen: (db) async => await reset(db, _version)
       );
     }
     catch (ex) {
@@ -60,7 +61,7 @@ abstract class DB {
   static Future<int> insertDailyBalance(Map<String, Object?> map) async => await insertItemOnTableAsync(tableDailyBalance, map);
   static Future<int> insertCardMovement(Map<String, Object?> map) async => await insertItemOnTableAsync(tableCardMovement, map);
   static Future<int> insertRegister(Map<String, Object?> map) async => await insertItemOnTableAsync(tableRegister, map);
-  static Future<int> insertExpenses(Map<String, Object?> map) async => await insertItemOnTableAsync(tableExpenses, map);
+  static Future<int> insertExpense(Map<String, Object?> map) async => await insertItemOnTableAsync(tableExpenses, map);
   static Future<int> insertResources(Map<String, Object?> map) async => await insertItemOnTableAsync(tableResources, map);
   static Future<int> insertCardTaxes(Map<String, Object?> map) async => await insertItemOnTableAsync(tableCardTaxes, map);
 
@@ -72,17 +73,33 @@ abstract class DB {
     );
   }
 
-  static Future<List<DailyBalanceDto>> getAllBalances() async {
+  static Future<List<DailyBalanceDto>> getAllBalances(int startDate, int endDate) async {
     return (await _db!
-      .rawQuery(QueriesSQL.getDailyBalanceSql))
-      .map((e) => DataMapper.toDailyBalanceDto(e))
+      .rawQuery(QueriesSQL.getDailyBalanceSql, [startDate, endDate]))
+      .map((map) => DataMapper.toDailyBalanceDto(map))
       .toList();
   }
 
   static Future<List<ResourceDto>> getResources() async {
     return (await _db!
       .query(tableResources))
-      .map((e) => DataMapper.toResourceDto(e))
+      .map((map) => DataMapper.toResourceDto(map))
       .toList();
+  }
+
+  static Future<CardTaxesDto> getCardTaxes() async {
+    return (await _db!
+      .query(tableCardTaxes))
+      .map((map) => DataMapper.toCardTaxesDto(map))
+      .single;
+  }
+
+  static Future<void> deleteResource(int id) async {
+    await _db!
+      .delete(
+        tableResources,
+        where: 'id = ?',
+        whereArgs: [id]
+      );
   }
 }

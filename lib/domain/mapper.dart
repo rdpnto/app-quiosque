@@ -1,6 +1,8 @@
 import 'package:mobile/data/model/daily_balance_dto.dart';
+import 'package:mobile/data/model/resource_dto.dart';
 import 'package:mobile/domain/model/closure.dart';
 import 'package:mobile/domain/model/daily_balance.dart';
+import 'package:mobile/domain/model/resource.dart';
 
 class DomainMapper {
   static DailyBalance toDailyBalance(Closure model) {
@@ -26,5 +28,18 @@ class DomainMapper {
       closure: dto.closure,
       expenses: dto.expenses,
     );
+  }
+
+  static Resource toResource(ResourceDto dto) {
+    var model = Resource(
+      name: dto.name,
+      description: dto.description,
+      isEmployee: dto.isEmployee,
+      salary: dto.salary
+    );
+
+    model.setId(dto.id);
+
+    return model;
   }
 }

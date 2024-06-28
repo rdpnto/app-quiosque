@@ -1,3 +1,4 @@
+import 'package:mobile/data/model/card_taxes_dto.dart';
 import 'package:mobile/data/model/daily_balance_dto.dart';
 import 'package:mobile/data/model/resource_dto.dart';
 
@@ -11,7 +12,7 @@ class DataMapper {
       debit: map['debit'],
       opening: map['opening'],
       closure: map['closure'],
-      expenses: map['expenses']
+      expenses: map['expenses'] ?? 0
     );
   }
 
@@ -23,5 +24,9 @@ class DataMapper {
       isEmployee: map['isEmployee'] == 1,
       salary: map['salary']
     );
+  }
+
+  static CardTaxesDto toCardTaxesDto(Map<String, dynamic> map) {
+    return CardTaxesDto(map['credit_tax'], map['debit_tax']);
   }
 }

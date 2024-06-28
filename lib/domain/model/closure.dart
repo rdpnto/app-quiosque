@@ -1,12 +1,12 @@
 import 'package:mobile/data/db_cache.dart';
 import 'package:mobile/domain/model/card_movement.dart';
-import 'package:mobile/domain/model/outcome_trail.dart';
+import 'package:mobile/domain/model/expense.dart';
 import 'package:mobile/domain/model/register.dart';
 
 class Closure {
   late CardMovement cardMovement;
   late Register register;
-  late OutcomeTrail outcomeTrail;
+  late List<Expense> expenseTrail;
 
   DateTime datePosition;
   double cashBalance;
@@ -27,21 +27,20 @@ class Closure {
     required double credit,
     required double opening,
     required double closure,
-    required Map<String, double> employeeExpenses,
-    required double gas,
-    required double potato
+    required Map<String, double> expenseList
   }) {
     cardMovement = CardMovement(credit, debit);
     register = Register(opening, closure);
 
-    outcomeTrail = OutcomeTrail(
-      employees: employeeExpenses,
-      gas: gas,
-      potato: potato
-    );
+    expenseTrail = expenseList.entries.map((e) => Expense(
+      datePosition: datePosition,
+      name: e.key,
+      resourceId: DBCache.resourceIds[e.key]!.toInt(),
+      value: e.value
+    ))
+    .toList();
 
-    expenses = outcomeTrail.total;
-
+    expenses = expenseTrail.fold(0.0, (sum, exp) => sum + exp.value);
     grossBalance = cashBalance + pixBalance + cardMovement.grossBalance - change;
     netBalance = grossBalance - expenses - cardMovement.discountedAmount;
   }
@@ -58,7 +57,7 @@ class Closure {
   }) {
     cardMovement = CardMovement(credit, debit);
     register = Register(opening, closure);
-    
+
     grossBalance = cashBalance + pixBalance + cardMovement.grossBalance - change;
     netBalance = grossBalance - expenses - cardMovement.discountedAmount;
   }
@@ -88,23 +87,8 @@ class Closure {
     };
   }
 
-  List<Map<String, Object?>> toExpensesMap() {
-    return outcomeTrail
-      .employees
-      .entries
-      .map((kvp) {
-        return {
-          'date': datePosition.toUtc().millisecondsSinceEpoch,
-          'resource_id': DBCache.resourceIds[kvp.key],
-          'name': kvp.key,
-          'value': kvp.value
-        };
-      })
-      .toList();
-  }
-
   @override
   String toString() {
-    return 'Closure { date: $datePosition, cash: $cashBalance, pix: $pixBalance, card: $cardBalance, change: $change, expenses: $expenses, total: $netBalance }';
+    return 'Closure { date: $datePosition, cash: $cashBalance, pix: $pixBalance, card: $cardBalance, change: $change, expenses: $expenseTrail, total: $netBalance }';
   }
 }

@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile/data/db_management.dart';
-import 'package:mobile/domain/service/balance_service.dart';
+import 'package:mobile/pages/domain.dart';
 import 'package:mobile/pages/home.dart';
 import 'package:mobile/pages/register.dart';
 
 class Entrypoint extends StatefulWidget {
-  
   @override
   State<Entrypoint> createState() => _EntrypointState();
 }
 
 class _EntrypointState extends State<Entrypoint> {
+  late DateFormat dateFormat;
+  late DateFormat timeFormat;
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
     DB.init();
+    
+    initializeDateFormatting();
+    dateFormat = DateFormat.yMMMMd('pt_BR');
+    timeFormat = DateFormat.Hms('pt_BR');
   }
 
   @override
@@ -30,7 +37,7 @@ class _EntrypointState extends State<Entrypoint> {
       case 1:
         page = RegisterPage(); break;
       case 2:
-        page = HomePage(); break; //ConfigPage Domain
+        page = DomainPage(); break; //ConfigPage Domain
       default:
         throw UnimplementedError('no widget for $_selectedIndex');
     }
