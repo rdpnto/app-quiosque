@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile/core/app_state.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -7,48 +9,86 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
-    var total = appState.total;
 
-    final theme = Theme.of(context);
-    // final style = theme.textTheme.displayMedium!.copyWith(
-    //   color: theme.colorScheme.onPrimary
-    // );
+    final style = Theme.of(context).textTheme.displayMedium!.apply(fontSizeFactor: 0.46);
+    
+    var date = DateFormat(DateFormat.YEAR_MONTH, 'pt_Br').format(DateTime(appState.year, appState.month));
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () => appState.insertBalance(),
-                child: Text('Insert')
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () => appState.getBalances(),
-                child: Text('Get Balances')
-              ),
-            ]
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Fechamento $date', style: style),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.date_range),
+            tooltip: 'Selecione a data',
+            onPressed: () async {
+              final selected = await showMonthYearPicker(
+                context: context,
+                initialDate: DateTime(appState.year, appState.month),
+                firstDate: DateTime(2022),
+                lastDate: DateTime(2030),
+                locale: Locale('pt', 'BR'),
+              );
+
+              if (selected != null) {
+                appState.setDate(selected.year, selected.month);
+                await appState.getBalances();
+              }
+            },
           ),
-          SizedBox(height: 10),
-          Center(
-            child: Card(
-              color: theme.colorScheme.primary,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  'total balances: $total'
-                )
-              )
-            )
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Atualizar',
+            onPressed: () async => await appState.getBalances()
           )
         ]
-      )
+      ),
+      body: HomeTable()
     );
   }
-  
+}
+
+class HomeTable extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
+    var rows = appState
+      .balances
+      .map((e) {
+        return DataRow(cells: [
+          DataCell(Text(DateFormat('dd/MM/yyyy').format(e.date))),
+          DataCell(Text('R\$ ${e.cash.toStringAsFixed(2).replaceFirst('.', ',')}')),
+          DataCell(Text('R\$ ${e.pix.toStringAsFixed(2).replaceFirst('.', ',')}')),
+          DataCell(Text('R\$ ${e.card.toStringAsFixed(2).replaceFirst('.', ',')}')),
+          DataCell(Text('R\$ ${e.change.toStringAsFixed(2).replaceFirst('.', ',')}')),
+          DataCell(Text('R\$ ${e.expenses.toStringAsFixed(2).replaceFirst('.', ',')}')),
+          DataCell(Text('R\$ ${e.netBalance.toStringAsFixed(2).replaceFirst('.', ',')}'))
+        ]);
+      })
+      .toList();
+      
+    var theme = Theme.of(context);
+    var style = theme.textTheme.displayMedium!
+      .copyWith(color: Colors.black87, fontStyle: FontStyle.italic)
+      .apply(fontSizeFactor: 0.36);
+    
+    return InteractiveViewer(
+      transformationController: TransformationController(),
+      minScale: 1.0,
+      maxScale: 2.0,
+      constrained: false,
+      child: DataTable(
+        columns: <DataColumn>[
+          DataColumn(label: Expanded(child: Text('Data', style: style))),
+          DataColumn(label: Expanded(child: Text('Dinheiro', style: style))),
+          DataColumn(label: Expanded(child: Text('Pix', style: style))),
+          DataColumn(label: Expanded(child: Text('Cartão', style: style))),
+          DataColumn(label: Expanded(child: Text('Troco', style: style))),
+          DataColumn(label: Expanded(child: Text('Saídas', style: style))),
+          DataColumn(label: Expanded(child: Text('Total', style: style)))
+        ],
+        rows: rows
+      ),
+    );
+  }
 }

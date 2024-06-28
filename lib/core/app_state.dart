@@ -1,37 +1,103 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/data/db_management.dart';
-import 'package:mobile/data/model/daily_balance_dto.dart';
-import 'package:mobile/domain/closure.dart';
-import 'package:mobile/domain/daily_balance.dart';
+import 'package:mobile/domain/model/daily_balance.dart';
+import 'package:mobile/domain/model/resource.dart';
+import 'package:mobile/domain/service/balance_service.dart';
 
 class AppState extends ChangeNotifier {
-  AppState() {
-    DB.init();
-  }
+  BalanceService service = BalanceService();
+  bool serviceStarted = false;
+
+  int month = DateTime.now().month;
+  int year = DateTime.now().year;
   
-  List<DailyBalance> balances = <DailyBalance>[];
-  int total = 0;
+  List<DailyBalance> balances = [];
+  List<Resource> resources = [];
 
-  Future<void> insertBalance() async {
-    var dto = Mapper.toDto(Closure(
-      datePosition: DateTime.now(),
-      cashBalance: 100,
-      pixBalance: 100,
-      credit: 100,
-      debit: 100,
-      opening: 100,
-      closure: 120,
-      employeeOutcomes: { 'vitor': 10 },
-      gas: 10,
-      potato: 10
-    ));
+  bool flagEmpl = false;
 
-    await DB.insertDailyBalance(dto);
+  Future<void> initService() async {
+    var success = await service.init();
+
+    if (!success) throw Exception();
+
+    serviceStarted = success;
+  }
+
+  Future<void> insertBalance(
+    DateTime datePosition,
+    double cashBalance,
+    double pixBalance,
+    double credit,
+    double debit,
+    double opening,
+    double closure,
+    Map<String, double> employeeExpenses,
+    double gas,
+    double potato
+  ) async {
+    if (!serviceStarted) await initService();
+
+    await service.insertBalance(
+      datePosition,
+      cashBalance,
+      pixBalance,
+      credit,
+      debit,
+      opening,
+      closure,
+      employeeExpenses,
+      gas,
+      potato
+    );
+  
+    await getBalances();
+  }
+
+  Future<void> insertResource(
+    String name,
+    String description,
+    bool isEmployee,
+    double salary
+  ) async {
+    if (!serviceStarted) await initService();
+
+    await service.insertResource(
+      name,
+      description,
+      isEmployee,
+      salary
+    );
+
+    await getResources();
   }
 
 	Future<void> getBalances() async {
-    total = await DB.getAllBalances();
+    if (!serviceStarted) await initService();
+
+    balances = await service.getMontlyBalance(year, month);
     
+    notifyListeners();
+  }
+
+  Future<void> getResources() async {
+    if (!serviceStarted) await initService();
+
+    resources = await service.getResources();
+
+    notifyListeners();
+  }
+
+  Future<void> deleteResource(String name) async {
+    return await service.deleteResource(name);
+  }
+
+  void setDate(int year, int month) {
+    this.year = year;
+    this.month = month;
+  }
+
+  void setFlag(bool flag) {
+    flagEmpl = flag;
     notifyListeners();
   }
 }
